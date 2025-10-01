@@ -83,8 +83,8 @@
                             <div class="flex items-center justify-between gap-2">
                                 <p class="font-medium truncate">{{ $cat->name }}</p>
                                 <flux:badge variant="solid" size="sm"
-                                    color="{{ $cat->status === 'active' ? 'emerald' : 'yellow' }}">
-                                    {{ $cat->status }}
+                                    color="{{ $cat->status === 'active' ? 'emerald' : 'red' }}">
+                                    {{ ucfirst($cat->status) }}
                                 </flux:badge>
                             </div>
 
