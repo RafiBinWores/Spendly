@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Category\CategoryIndex;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -32,6 +33,10 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+
+    // Categories
+    Route::get('categories', CategoryIndex::class)->name('categories.index');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
