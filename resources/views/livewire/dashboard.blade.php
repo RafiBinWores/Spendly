@@ -61,32 +61,18 @@
         </div>
 
         {{-- Charts --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {{-- Pie Chart --}}
-            <div class="p-4 rounded-2xl border bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm" wire:ignore>
-                <h3 class="font-semibold mb-2">Overview (Pie)</h3>
+            <div class="p-4 rounded-2xl border bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm md:col-span-2" wire:ignore>
+                <h3 class="font-semibold mb-2">Overview</h3>
                 <div class="relative h-64">
                     <canvas id="expensePie" class="absolute inset-0 w-full h-full"></canvas>
                 </div>
-                <ul class="mt-4 space-y-2 text-sm">
-                    <li class="flex justify-between">
-                        <span>Income</span>
-                        <span class="font-medium">৳ {{ number_format($chartDataPie['values'][0], 2) }}</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span>Expense</span>
-                        <span class="font-medium">৳ {{ number_format($chartDataPie['values'][1], 2) }}</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span>Balance</span>
-                        <span class="font-medium">৳ {{ number_format($chartDataPie['values'][2], 2) }}</span>
-                    </li>
-                </ul>
             </div>
 
             {{-- Line Chart --}}
-            <div class="p-4 rounded-2xl border bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm" wire:ignore>
-                <h3 class="font-semibold mb-2">Income vs Expense (Line)</h3>
+            <div class="p-4 rounded-2xl border bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm md:col-span-3" wire:ignore>
+                <h3 class="font-semibold mb-2">Income vs Expense</h3>
                 <div class="relative h-64">
                     <canvas id="incomeExpenseLine" class="absolute inset-0 w-full h-full"></canvas>
                 </div>
@@ -149,7 +135,7 @@
         </div>
 
         @push('scripts')
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="{{ asset('assets/js/chart.js') }}"></script>
             <script>
                 let expensePie = null;
                 let incomeExpenseLine = null;
