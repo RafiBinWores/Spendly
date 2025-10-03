@@ -25,7 +25,7 @@ class ExpenseModal extends Component
     {
         return [
             'category_id' => 'nullable|exists:categories,id',
-            'source' => 'required|string|max:255|unique:expenses,source,' . $this->expenseId,
+            'source' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'expense_date' => 'required|date',
             'note' => 'nullable|string',

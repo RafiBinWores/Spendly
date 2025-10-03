@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Category\CategoryIndex;
+use App\Livewire\Dashboard;
 use App\Livewire\Expense\ExpenseIndex;
 use App\Livewire\Income\IncomeIndex;
 use App\Livewire\Settings\Appearance;
@@ -14,9 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    Route::get('dashboard', Dashboard::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

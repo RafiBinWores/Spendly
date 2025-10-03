@@ -24,7 +24,7 @@ class IncomeModal extends Component
     public function rules(): array
     {
         return [
-            'source' => 'required|string|max:255|unique:incomes,source,' . $this->incomeId,
+            'source' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'income_date' => 'required|date',
             'note' => 'nullable|string',
