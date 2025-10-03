@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Category\CategoryIndex;
+use App\Livewire\Expense\ExpenseIndex;
+use App\Livewire\Income\IncomeIndex;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -37,6 +39,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Categories
     Route::get('categories', CategoryIndex::class)->name('categories.index');
+
+    // Income routes
+    Route::get('incomes', IncomeIndex::class)->name('incomes.index');
+
+    Route::get('expenses', ExpenseIndex::class)->name('expenses.index');
 });
 
 require __DIR__ . '/auth.php';

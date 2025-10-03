@@ -25,10 +25,10 @@
                     <flux:navlist.item icon="list-bullet" :href="route('categories.index')" :current="request()->routeIs('categories.index')" wire:navigate>{{ __('Category') }}</flux:navlist.item>
 
                     {{-- Income --}}
-                    <flux:navlist.item icon="income-icon" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Income') }}</flux:navlist.item>
+                    <flux:navlist.item icon="income-icon" :href="route('incomes.index')" :current="request()->routeIs('incomes.index')" wire:navigate>{{ __('Income') }}</flux:navlist.item>
 
                     {{-- Expense --}}
-                    <flux:navlist.item icon="currency-bangladeshi" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Expense') }}</flux:navlist.item>
+                    <flux:navlist.item icon="currency-bangladeshi" :href="route('expenses.index')" :current="request()->routeIs('expenses.index')" wire:navigate>{{ __('Expense') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 

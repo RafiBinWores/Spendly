@@ -10,9 +10,6 @@
             </div>
 
 
-
-
-            {{-- Icon (Heroicons) --}}
             {{-- Icon (Heroicons) --}}
 <div class="form-group"
      x-data="{

@@ -1,38 +1,47 @@
 <?php
 
-namespace App\Livewire\Category;
+namespace App\Livewire\Income;
 
-use App\Models\Category;
+use App\Models\Income;
 use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Str;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
-class CategoryModal extends Component
+class IncomeModal extends Component
 {
-    use WithFileUploads;
     use WithTcToast;
 
-    public $categoryId = null;
+    public $incomeId = null;
     public $isView = false;
 
     public string $icon = '';
     public string $iconStyle = 'o';
 
-    public $name = null, $status = 'active';
+    public $source = null, $amount = null, $income_date = null, $note = null;
 
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:categories,name,' . $this->categoryId,
-            'icon'             => 'nullable|string|max:64',
-            'iconStyle'        => 'required|in:o,s',
-            'status' => 'required|in:active,disable',
+            'source' => 'required|string|max:255|unique:incomes,source,' . $this->incomeId,
+            'amount' => 'required|numeric|min:0',
+            'income_date' => 'required|date',
+            'note' => 'nullable|string',
+            'icon' => 'nullable|string|max:64',
+            'iconStyle' => 'required|in:o,s',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'source.required' => 'The income source field is required.',
+            'amount.required' => 'The amount field is required.',
+            'income_date.required' => 'The date field is required.',
+        ];
+    }
+
 
     public function updated($propertyName)
     {
@@ -51,19 +60,20 @@ class CategoryModal extends Component
         // Prepare the payload
         $saveData = [
             'user_id'    => Auth::user()->id,
-            'name'       => $this->name,
-            'slug'       => Str::slug($this->name),
+            'source'       => $this->source,
+            'amount'       => $this->amount,
+            'income_date'       => $this->income_date,
+            'note'       => $this->note,
             'icon'       => $this->icon,
             'icon_style' => $this->iconStyle,
-            'status'     => $this->status,
         ];
 
-        if ($this->categoryId) {
-            $category = Category::find($this->categoryId);
+        if ($this->incomeId) {
+            $income = Income::find($this->incomeId);
 
-            if (!$category) {
+            if (!$income) {
                 $this->error(
-                    title: 'Category not found!',
+                    title: 'Income not found!',
                     position: 'top-right',
                     showProgress: true,
                     showCloseIcon: true,
@@ -72,10 +82,10 @@ class CategoryModal extends Component
             }
 
             // Check for changes WITHOUT persisting
-            $original = $category->getAttributes();
-            $category->fill($saveData);
-            $hasChanges = $category->isDirty();
-            $category->fill($original); // revert to original before actual update
+            $original = $income->getAttributes();
+            $income->fill($saveData);
+            $hasChanges = $income->isDirty();
+            $income->fill($original); // revert to original before actual update
 
             if (!$hasChanges) {
                 $this->warning(
@@ -84,42 +94,41 @@ class CategoryModal extends Component
                     showProgress: true,
                     showCloseIcon: true,
                 );
-                $this->dispatch('categories:refresh');
-                Flux::modal('category-modal')->close();
+                $this->dispatch('incomes:refresh');
+                Flux::modal('income-modal')->close();
                 return;
             }
 
             // Persist updates
-            $category->update($saveData);
+            $income->update($saveData);
 
             $this->success(
-                title: 'Category updated successfully.',
+                title: 'income updated successfully.',
                 position: 'top-right',
                 showProgress: true,
                 showCloseIcon: true,
             );
         } else {
-            Category::create($saveData);
+            Income::create($saveData);
 
             // Reset fields you want cleared for a fresh form (adjust as needed)
             $this->reset();
-            $this->status = 'active';
 
             $this->success(
-                title: 'Category created successfully.',
+                title: 'income created successfully.',
                 position: 'top-right',
                 showProgress: true,
                 showCloseIcon: true,
             );
         }
 
-        $this->dispatch('categories:refresh');
-        Flux::modal('category-modal')->close();
+        $this->dispatch('incomes:refresh');
+        Flux::modal('income-modal')->close();
     }
 
 
-    #[On('open-category-modal')]
-    public function categoryDetail($mode, $category = null)
+    #[On('open-income-modal')]
+    public function incomeDetail($mode, $income = null)
     {
 
         $this->resetErrorBag();
@@ -131,15 +140,16 @@ class CategoryModal extends Component
 
             $this->isView = false;
             $this->reset();
-            $this->status = 'active';
         } else {
-            // dd($category);
-            $this->categoryId = $category['id'];
+            // dd($income);
+            $this->incomeId = $income['id'];
 
-            $this->name = $category['name'];
-            $this->icon = $category['icon'];
-            $this->iconStyle = $category['icon_style'];
-            $this->status = $category['status'];
+            $this->source = $income['source'];
+            $this->amount = $income['amount'];
+            $this->income_date = $income['income_date'];
+            $this->note = $income['note'];
+            $this->icon = $income['icon'];
+            $this->iconStyle = $income['icon_style'];
         }
     }
 
@@ -147,7 +157,7 @@ class CategoryModal extends Component
     {
         $icons = json_decode(file_get_contents(resource_path('data/heroicons.json')), true);
 
-        return view('livewire.category.category-modal', [
+        return view('livewire.income.income-modal', [
             'availableIcons' => $icons,
         ]);
     }
