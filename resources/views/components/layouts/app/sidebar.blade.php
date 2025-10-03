@@ -29,6 +29,9 @@
 
                     {{-- Expense --}}
                     <flux:navlist.item icon="currency-bangladeshi" :href="route('expenses.index')" :current="request()->routeIs('expenses.index')" wire:navigate>{{ __('Expense') }}</flux:navlist.item>
+
+                    {{-- Filter --}}
+                    <flux:navlist.item icon="funnel" :href="route('reports.transactions')" :current="request()->routeIs('reports.transactions')" wire:navigate>{{ __('Filter') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
