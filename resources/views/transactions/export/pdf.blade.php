@@ -24,6 +24,7 @@
     <table>
         <thead>
             <tr>
+                <th>SL</th>
                 <th>Date</th>
                 <th>Type</th>
                 <th>Category</th>
@@ -34,24 +35,25 @@
         <tbody>
             @forelse ($rows as $r)
                 <tr>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ \Carbon\Carbon::parse($r->transacted_at)->format('Y-m-d H:i') }}</td>
                     <td>{{ ucfirst($r->type) }}</td>
                     <td>{{ $r->category_name ?? '—' }}</td>
                     <td>{{ $r->note }}</td>
-                    <td class="right">{{ number_format($r->amount, 2) }}</td>
+                    <td class="right">Tk. {{ number_format($r->amount, 2) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="muted">No data found.</td>
+                    <td colspan="6" class="muted">No data found.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
     <div class="summary">
-        <strong>Total Income:</strong> {{ number_format($totals['income'], 2) }} |
-        <strong>Total Expense:</strong> {{ number_format($totals['expense'], 2) }} |
-        <strong>Balance:</strong> {{ number_format($totals['balance'], 2) }}
+        <strong>Total Income:</strong> Tk. {{ number_format($totals['income'], 2) }} |
+        <strong>Total Expense:</strong> Tk. {{ number_format($totals['expense'], 2) }} |
+        <strong>Balance:</strong> Tk. {{ number_format($totals['balance'], 2) }}
     </div>
 </body>
 </html>

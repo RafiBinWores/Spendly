@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TransactionsExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -14,7 +16,7 @@ class ReportController extends Controller
         $uid = Auth::id();
 
         $incomes = DB::table('incomes as i')
-            ->when($from && $to, fn($q) => $q->whereBetween('i.income_date', [$from.' 00:00:00', $to.' 23:59:59']))
+            ->when($from && $to, fn($q) => $q->whereBetween('i.income_date', [$from . ' 00:00:00', $to . ' 23:59:59']))
             ->where('i.user_id', $uid)
             ->select([
                 'i.id',
@@ -27,7 +29,7 @@ class ReportController extends Controller
 
         $expenses = DB::table('expenses as e')
             ->leftJoin('categories as c', 'c.id', '=', 'e.category_id')
-            ->when($from && $to, fn($q) => $q->whereBetween('e.expense_date', [$from.' 00:00:00', $to.' 23:59:59']))
+            ->when($from && $to, fn($q) => $q->whereBetween('e.expense_date', [$from . ' 00:00:00', $to . ' 23:59:59']))
             ->where('e.user_id', $uid)
             ->select([
                 'e.id',
@@ -49,23 +51,13 @@ class ReportController extends Controller
 
     public function exportExcel(Request $request)
     {
-        // handled in section 3.2 (kept here for completeness)
-        return app()->call([self::class, 'exportExcelImpl'], ['request' => $request]);
-    }
-
-    public function exportExcelImpl(Request $request)
-    {
         $type = $request->string('type', 'all')->toString();
         $from = $request->input('from');
         $to   = $request->input('to');
 
-        $file = 'transactions_'.now()->format('Ymd_His').'.xlsx';
-        return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\TransactionsExport($type, $from, $to),
-            $file
-        );
+        $file = 'transactions_' . now()->format('Ymd_His') . '.xlsx';
+        return Excel::download(new TransactionsExport($type, $from, $to), $file);
     }
-
     public function exportPdf(Request $request)
     {
         $type = $request->string('type', 'all')->toString();
@@ -81,13 +73,13 @@ class ReportController extends Controller
 
         $pdf = Pdf::loadView('transactions.export.pdf', [
             'rows'  => $rows,
-            'totals'=> $totals,
+            'totals' => $totals,
             'type'  => $type,
             'from'  => $from,
             'to'    => $to,
         ])->setPaper('a4', 'portrait');
 
-        $file = 'transactions_'.now()->format('Ymd_His').'.pdf';
+        $file = 'transactions_' . now()->format('Ymd_His') . '.pdf';
         return $pdf->download($file);
     }
 
@@ -99,8 +91,8 @@ class ReportController extends Controller
         $expenseQ = DB::table('expenses')->where('user_id', $uid);
 
         if ($from && $to) {
-            $incomeQ->whereBetween('income_date', [$from.' 00:00:00', $to.' 23:59:59']);
-            $expenseQ->whereBetween('expense_date', [$from.' 00:00:00', $to.' 23:59:59']);
+            $incomeQ->whereBetween('income_date', [$from . ' 00:00:00', $to . ' 23:59:59']);
+            $expenseQ->whereBetween('expense_date', [$from . ' 00:00:00', $to . ' 23:59:59']);
         }
 
         if ($type === 'income') {

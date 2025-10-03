@@ -134,7 +134,7 @@
         </ul>
 
         <!-- Desktop table (≥sm) -->
-        <div class="overflow-x-auto max-h-[50vh] mt-2 hidden sm:block">
+        <div class="overflow-x-auto mt-2 hidden sm:block">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
                     class="tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
