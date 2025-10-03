@@ -148,6 +148,7 @@
                             'name' => 'amount',
                             'displayName' => 'Amount',
                         ])
+                        <th scope="col" class="px-4 lg:px-6 py-3">Note</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'income_date',
                             'displayName' => 'Date',
@@ -176,6 +177,9 @@
                                     color="violet">
                                     {{ $income->amount }}
                                 </flux:badge>
+                            </td>
+                            <td class="px-4 lg:px-6 py-3 capitalize truncate max-w-[16rem]">
+                                {{ $income->note ?? '—' }}
                             </td>
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 {{ date('M d, Y', strtotime($income->income_date)) }}
