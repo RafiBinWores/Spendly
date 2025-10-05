@@ -10,7 +10,7 @@
     {{-- Create modal Button --}}
     <flux:modal.trigger name="category-modal">
         <flux:button class="cursor-pointer" icon="plus-circle" variant="primary"
-            wire:click="$dispatch('open-category-modal', {mode: 'create'})">Add New Category</flux:button>
+            wire:click="$dispatch('open-category-modal', {mode: 'create'})">Add Category</flux:button>
     </flux:modal.trigger>
 
     {{-- Category Modal --}}
@@ -73,9 +73,9 @@
             @forelse ($categories as $cat)
                 <li class="rounded-xl border dark:border-neutral-600 p-3 bg-white dark:bg-neutral-700">
                     <div class="flex items-center gap-3">
-                        <div class="shrink-0 bg-accent rounded-lg p-2">
+                        <div class="shrink-0 bg-neutral-800 rounded-lg p-2">
                             @if ($cat->icon)
-                                <x-dynamic-component :component="'heroicon-' . ($cat->iconStyle ?? 'o') . '-' . $cat->icon" class="w-5 h-5" />
+                                <span>{{ $cat->icon }}</span>
                             @endif
                         </div>
 
@@ -163,9 +163,9 @@
                             </th>
                             <td class="px-4 lg:px-6 py-3">{{-- Example: show category icon + name --}}
                                 <div class="flex items-center gap-2">
-                                    <div class="bg-accent-content p-2 rounded-lg shrink-0">
+                                    <div class="bg-neutral-800 p-2 rounded-lg shrink-0">
                                         @if ($cat->icon)
-                                            <x-dynamic-component :component="'heroicon-' . ($cat->iconStyle ?? 'o') . '-' . $cat->icon" class="w-5 h-5" />
+                                            <span>{{ $cat->icon }}</span>
                                         @endif
                                     </div>
                                     <span>{{ $cat->name }}</span>

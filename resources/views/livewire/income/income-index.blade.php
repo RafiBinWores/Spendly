@@ -73,9 +73,9 @@
             @forelse ($incomes as $income)
                 <li class="rounded-xl border dark:border-neutral-600 p-3 bg-white dark:bg-neutral-700">
                     <div class="flex items-center gap-3">
-                        <div class="shrink-0 bg-accent rounded-lg p-2">
+                        <div class="shrink-0 bg-neutral-800 rounded-lg p-2">
                             @if ($income->icon)
-                                <x-dynamic-component :component="'heroicon-' . ($income->iconStyle ?? 'o') . '-' . $income->icon" class="w-5 h-5" />
+                                <span class="size-5">{{ $income->icon }}</span>
                             @endif
                         </div>
 
@@ -164,9 +164,9 @@
                             </th>
                             <td class="px-4 lg:px-6 py-3">{{-- Example: show category icon + name --}}
                                 <div class="flex items-center gap-2">
-                                    <div class="bg-accent-content p-2 rounded-lg shrink-0">
+                                    <div class="bg-neutral-800 p-2 rounded-lg shrink-0">
                                         @if ($income->icon)
-                                            <x-dynamic-component :component="'heroicon-' . ($income->iconStyle ?? 'o') . '-' . $income->icon" class="w-5 h-5" />
+                                        <span>{{ $income->icon }}</span>
                                         @endif
                                     </div>
                                     <span>{{ $income->source }}</span>
