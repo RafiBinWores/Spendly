@@ -17,7 +17,6 @@ class IncomeModal extends Component
     public $isView = false;
 
     public string $icon = '';
-    public string $iconStyle = 'o';
 
     public $source = null, $amount = null, $income_date = null, $note = null;
 
@@ -29,7 +28,6 @@ class IncomeModal extends Component
             'income_date' => 'required|date',
             'note' => 'nullable|string',
             'icon' => 'nullable|string|max:64',
-            'iconStyle' => 'required|in:o,s',
         ];
     }
 
@@ -65,7 +63,6 @@ class IncomeModal extends Component
             'income_date'       => $this->income_date,
             'note'       => $this->note,
             'icon'       => $this->icon,
-            'icon_style' => $this->iconStyle,
         ];
 
         if ($this->incomeId) {
@@ -149,16 +146,12 @@ class IncomeModal extends Component
             $this->income_date = $income['income_date'];
             $this->note = $income['note'];
             $this->icon = $income['icon'];
-            $this->iconStyle = $income['icon_style'];
         }
     }
 
     public function render()
     {
-        $icons = json_decode(file_get_contents(resource_path('data/heroicons.json')), true);
 
-        return view('livewire.income.income-modal', [
-            'availableIcons' => $icons,
-        ]);
+        return view('livewire.income.income-modal');
     }
 }

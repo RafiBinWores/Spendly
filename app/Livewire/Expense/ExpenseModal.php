@@ -17,7 +17,6 @@ class ExpenseModal extends Component
     public $isView = false;
 
     public string $icon = '';
-    public string $iconStyle = 'o';
 
     public $source = null, $amount = null, $expense_date = null, $note = null, $category_id = null;
 
@@ -30,7 +29,6 @@ class ExpenseModal extends Component
             'expense_date' => 'required|date',
             'note' => 'nullable|string',
             'icon' => 'nullable|string|max:64',
-            'iconStyle' => 'required|in:o,s',
         ];
     }
 
@@ -68,7 +66,6 @@ class ExpenseModal extends Component
             'expense_date'       => $this->expense_date,
             'note'       => $this->note,
             'icon'       => $this->icon,
-            'icon_style' => $this->iconStyle,
         ];
 
         if ($this->expenseId) {
@@ -153,16 +150,12 @@ class ExpenseModal extends Component
             $this->category_id = $expense['category_id'];
             $this->note = $expense['note'];
             $this->icon = $expense['icon'];
-            $this->iconStyle = $expense['icon_style'];
         }
     }
 
     public function render()
     {
-        $icons = json_decode(file_get_contents(resource_path('data/heroicons.json')), true);
 
-        return view('livewire.expense.expense-modal', [
-            'availableIcons' => $icons,
-        ]);
+        return view('livewire.expense.expense-modal');
     }
 }

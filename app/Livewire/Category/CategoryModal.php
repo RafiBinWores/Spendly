@@ -20,7 +20,6 @@ class CategoryModal extends Component
     public $isView = false;
 
     public string $icon = '';
-    public string $iconStyle = 'o';
 
     public $name = null, $status = 'active';
 
@@ -29,7 +28,6 @@ class CategoryModal extends Component
         return [
             'name' => 'required|string|max:255|unique:categories,name,' . $this->categoryId,
             'icon'             => 'nullable|string|max:64',
-            'iconStyle'        => 'required|in:o,s',
             'status' => 'required|in:active,disable',
         ];
     }
@@ -54,7 +52,6 @@ class CategoryModal extends Component
             'name'       => $this->name,
             'slug'       => Str::slug($this->name),
             'icon'       => $this->icon,
-            'icon_style' => $this->iconStyle,
             'status'     => $this->status,
         ];
 
@@ -138,17 +135,13 @@ class CategoryModal extends Component
 
             $this->name = $category['name'];
             $this->icon = $category['icon'];
-            $this->iconStyle = $category['icon_style'];
             $this->status = $category['status'];
         }
     }
 
     public function render()
     {
-        $icons = json_decode(file_get_contents(resource_path('data/heroicons.json')), true);
 
-        return view('livewire.category.category-modal', [
-            'availableIcons' => $icons,
-        ]);
+        return view('livewire.category.category-modal');
     }
 }
