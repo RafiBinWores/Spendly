@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
             $table->string('icon');
-            $table->enum('icon_style', ['o', 's'])->default('o');
             $table->enum('status', ['active', 'disable'])->default('active');
             $table->timestamps();
             

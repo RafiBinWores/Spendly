@@ -13,7 +13,6 @@ class Income extends Model
         'income_date',
         'note',
         'icon',
-        'icon_style',
     ];
 
     public function user()

@@ -14,7 +14,6 @@ class Expense extends Model
         'expense_date',
         'note',
         'icon',
-        'icon_style',
     ];
 
     public function user()
