@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DownloadPublicFileController;
 use App\Http\Controllers\ReportController;
 use App\Livewire\Category\CategoryIndex;
 use App\Livewire\Dashboard;
@@ -58,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('transactions.export_excel');
     Route::get('/transactions/export/pdf', [ReportController::class, 'exportPdf'])
         ->name('transactions.export_pdf');
+
+        Route::get('/download/{path}', DownloadPublicFileController::class)
+    ->where('path', '.*')
+    ->name('files.download');
 });
 
 require __DIR__ . '/auth.php';
