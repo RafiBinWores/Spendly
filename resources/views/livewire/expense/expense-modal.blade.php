@@ -11,137 +11,129 @@
 
             {{-- File uploads --}}
             <div>
-    <p class="text-sm mb-1">File upload</p>
+                <p class="text-sm mb-1">File upload</p>
 
-    <div
-        x-data="{
-            isOver: false,
-            isUploading: false,
-            progress: 0,
-            pick() { $refs.files.click(); }
-        }"
-        x-on:dragover.prevent="isOver=true"
-        x-on:dragleave.prevent="isOver=false"
-        x-on:drop.prevent="isOver=false"
-        x-on:livewire-upload-start="isUploading=true"
-        x-on:livewire-upload-finish="isUploading=false;progress=0"
-        x-on:livewire-upload-error="isUploading=false"
-        x-on:livewire-upload-progress="progress=$event.detail.progress"
-        class="flex flex-wrap gap-4"
-    >
-        {{-- Hidden input (bind to newFiles so picks append, not replace) --}}
-        <input
-            multiple
-            x-ref="files"
-            type="file"
-            accept=".jpg,.jpeg,.png,.webp,.svg,.pdf,.xls,.xlsx,.csv"
-            class="hidden"
-            wire:model.live="newFiles"
-            wire:key="file-input-{{ $expenseId ?? 'new' }}"
-            x-on:change="$nextTick(()=>{$refs.files.value=null})"
-            @disabled($isView)  {{-- Disable in view mode --}}
-        />
+                <div x-data="{
+                    isOver: false,
+                    isUploading: false,
+                    progress: 0,
+                    pick() { $refs.files.click(); }
+                }" x-on:dragover.prevent="isOver=true" x-on:dragleave.prevent="isOver=false"
+                    x-on:drop.prevent="isOver=false" x-on:livewire-upload-start="isUploading=true"
+                    x-on:livewire-upload-finish="isUploading=false;progress=0"
+                    x-on:livewire-upload-error="isUploading=false"
+                    x-on:livewire-upload-progress="progress=$event.detail.progress" class="flex flex-wrap gap-4">
+                    {{-- Hidden input (bind to newFiles so picks append, not replace) --}}
+                    <input multiple x-ref="files" type="file"
+                        accept=".jpg,.jpeg,.png,.webp,.svg,.pdf,.xls,.xlsx,.csv" class="hidden"
+                        wire:model.live="newFiles" wire:key="file-input-{{ $expenseId ?? 'new' }}"
+                        x-on:change="$nextTick(()=>{$refs.files.value=null})" @disabled($isView)
+                        {{-- Disable in view mode --}} />
 
-        {{-- Staged NEW uploads (not yet saved to disk) --}}
-        @foreach ($files as $i => $f)
-            @php
-                $ext    = strtolower($f->getClientOriginalExtension());
-                $isImg  = in_array($ext, ['jpg','jpeg','png','webp','svg']);
-                $name   = $f->getClientOriginalName();
-                $sizeKb = number_format($f->getSize() / 1024, 0);
-            @endphp
+                    {{-- Staged NEW uploads (not yet saved to disk) --}}
+                    @foreach ($files as $i => $f)
+                        @php
+                            $ext = strtolower($f->getClientOriginalExtension());
+                            $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'svg']);
+                            $name = $f->getClientOriginalName();
+                            $sizeKb = number_format($f->getSize() / 1024, 0);
+                        @endphp
 
-            <div class="w-[130px]">
-                <div class="relative h-[100px] w-full rounded-xl border overflow-hidden group bg-slate-100">
-                    @if ($isImg)
-                        <img src="{{ $f->temporaryUrl() }}" class="object-contain w-full h-full" alt="preview">
-                    @else
-                        <div class="flex flex-col items-center justify-center w-full h-full text-xs p-2">
-                            <span class="inline-grid place-items-center w-10 h-10 rounded-lg bg-slate-200 text-slate-700 font-semibold uppercase">{{ $ext }}</span>
-                            <span class="mt-1 text-[10px] text-slate-500">{{ $sizeKb }} KB</span>
+                        <div class="w-[130px]">
+                            <div class="relative h-[100px] w-full rounded-xl border overflow-hidden group bg-slate-100">
+                                @if ($isImg)
+                                    <img src="{{ $f->temporaryUrl() }}" class="object-contain w-full h-full"
+                                        alt="preview">
+                                @else
+                                    <div class="flex flex-col items-center justify-center w-full h-full text-xs p-2">
+                                        <span
+                                            class="inline-grid place-items-center w-10 h-10 rounded-lg bg-slate-200 text-slate-700 font-semibold uppercase">{{ $ext }}</span>
+                                        <span class="mt-1 text-[10px] text-slate-500">{{ $sizeKb }} KB</span>
+                                    </div>
+                                @endif
+
+                                {{-- Only allow removing staged files in edit/create --}}
+                                @unless ($isView)
+                                    <button type="button" wire:click="clearFile({{ $i }})"
+                                        class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/40 text-white"
+                                        title="Remove">🗑️</button>
+                                @endunless
+                            </div>
+
+                            <div class="mt-1 text-xs text-slate-700 truncate" title="{{ $name }}">
+                                {{ $name }}</div>
                         </div>
-                    @endif
+                    @endforeach
 
-                    {{-- Only allow removing staged files in edit/create --}}
-                    @unless($isView)
-                        <button type="button"
-                                wire:click="clearFile({{ $i }})"
-                                class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/40 text-white"
-                                title="Remove">🗑️</button>
+                    {{-- EXISTING saved files (public disk) --}}
+                    @foreach ($existingFiles as $i => $p)
+                        @php
+                            $ext = strtolower(pathinfo($p, PATHINFO_EXTENSION));
+                            $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'svg']);
+                            $name = basename($p);
+                            $url = asset('storage/' . $p);
+                        @endphp
+
+                        <div class="w-[130px]">
+                            <div class="relative h-[100px] w-full rounded-xl border overflow-hidden group bg-slate-100">
+                                @if ($isImg)
+                                    <a href="{{ $url }}" target="_blank">
+                                        <img src="{{ $url }}" class="object-contain w-full h-full"
+                                            alt="{{ $name }}">
+                                    </a>
+                                @else
+                                    <a href="{{ $url }}" target="_blank"
+                                        class="flex flex-col items-center justify-center w-full h-full text-xs p-2">
+                                        <span
+                                            class="inline-grid place-items-center w-10 h-10 rounded-lg bg-slate-200 text-slate-700 font-semibold uppercase">{{ $ext }}</span>
+                                        <span class="mt-1 text-[10px] text-slate-500">Open</span>
+                                    </a>
+                                @endif
+
+                                {{-- Overlay action:
+                         - View mode => Download
+                         - Edit/Create => Delete --}}
+                                @if ($isView)
+                                    <a href="{{ route('files.download', ['path' => $p]) }}"
+                                        class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/40 text-white"
+                                        title="Download">⬇️</a>
+                                @else
+                                    <button type="button" wire:click="clearExistingFile({{ $i }})"
+                                        class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/40 text-white"
+                                        title="Remove">🗑️</button>
+                                @endif
+                            </div>
+
+                            <div class="mt-1 text-xs text-slate-700 truncate" title="{{ $name }}">
+                                {{ $name }}</div>
+                        </div>
+                    @endforeach
+
+                    {{-- Upload progress tile --}}
+                    <template x-if="isUploading">
+                        <div
+                            class="relative h-[100px] w-[130px] rounded-xl border overflow-hidden bg-slate-800 text-white grid place-items-center">
+                            <div class="text-xs">Uploading…</div>
+                            <div class="absolute bottom-0 left-0 h-1 bg-white/80" :style="`width:${progress}%`"></div>
+                        </div>
+                    </template>
+
+                    {{-- Add button (hidden in view mode) --}}
+                    @unless ($isView)
+                        <button type="button" @click="pick()"
+                            class="h-[100px] w-[130px] rounded-xl border-2 border-dashed grid place-items-center hover:border-slate-900"
+                            :class="isOver ? 'border-slate-900 bg-slate-50' : 'border-slate-300'" title="Add file(s)"
+                            x-show="!isUploading">
+                            <span class="text-2xl leading-none">+</span>
+                        </button>
                     @endunless
                 </div>
 
-                <div class="mt-1 text-xs text-slate-700 truncate" title="{{ $name }}">{{ $name }}</div>
+                @error('newFiles.*')
+                    <p class="text-xs text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-slate-500">jpg/jpeg/png/webp/svg, pdf, xls/xlsx/csv • up to 5MB each</p>
             </div>
-        @endforeach
-
-        {{-- EXISTING saved files (public disk) --}}
-        @foreach ($existingFiles as $i => $p)
-            @php
-                $ext   = strtolower(pathinfo($p, PATHINFO_EXTENSION));
-                $isImg = in_array($ext, ['jpg','jpeg','png','webp','svg']);
-                $name  = basename($p);
-                $url   = asset('storage/'.$p);
-            @endphp
-
-            <div class="w-[130px]">
-                <div class="relative h-[100px] w-full rounded-xl border overflow-hidden group bg-slate-100">
-                    @if ($isImg)
-                        <a href="{{ $url }}" target="_blank">
-                            <img src="{{ $url }}" class="object-contain w-full h-full" alt="{{ $name }}">
-                        </a>
-                    @else
-                        <a href="{{ $url }}" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-xs p-2">
-                            <span class="inline-grid place-items-center w-10 h-10 rounded-lg bg-slate-200 text-slate-700 font-semibold uppercase">{{ $ext }}</span>
-                            <span class="mt-1 text-[10px] text-slate-500">Open</span>
-                        </a>
-                    @endif
-
-                    {{-- Overlay action:
-                         - View mode => Download
-                         - Edit/Create => Delete --}}
-                    @if ($isView)
-                        <a href="{{ route('files.download', ['path' => $p]) }}"
-                           class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/40 text-white"
-                           title="Download">⬇️</a>
-                    @else
-                        <button type="button"
-                                wire:click="clearExistingFile({{ $i }})"
-                                class="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/40 text-white"
-                                title="Remove">🗑️</button>
-                    @endif
-                </div>
-
-                <div class="mt-1 text-xs text-slate-700 truncate" title="{{ $name }}">{{ $name }}</div>
-            </div>
-        @endforeach
-
-        {{-- Upload progress tile --}}
-        <template x-if="isUploading">
-            <div class="relative h-[100px] w-[130px] rounded-xl border overflow-hidden bg-slate-800 text-white grid place-items-center">
-                <div class="text-xs">Uploading…</div>
-                <div class="absolute bottom-0 left-0 h-1 bg-white/80" :style="`width:${progress}%`"></div>
-            </div>
-        </template>
-
-        {{-- Add button (hidden in view mode) --}}
-        @unless($isView)
-            <button type="button"
-                    @click="pick()"
-                    class="h-[100px] w-[130px] rounded-xl border-2 border-dashed grid place-items-center hover:border-slate-900"
-                    :class="isOver ? 'border-slate-900 bg-slate-50' : 'border-slate-300'"
-                    title="Add file(s)"
-                    x-show="!isUploading">
-                <span class="text-2xl leading-none">+</span>
-            </button>
-        @endunless
-    </div>
-
-    @error('newFiles.*')
-        <p class="text-xs text-red-600">{{ $message }}</p>
-    @enderror
-    <p class="text-xs text-slate-500">jpg/jpeg/png/webp/svg, pdf, xls/xlsx/csv • up to 5MB each</p>
-</div>
 
 
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -200,13 +192,19 @@
 
             <div class="form-group">
                 @php
-                    $categories = App\Models\Category::where('status', 'active')->pluck('name', 'id');
+                    $categories = App\Models\Category::where('status', 'active')->get();
                 @endphp
 
-                <x-select wire:model.live="category_id" label="Category" :options="$categories"
-                    class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('category_id') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                    clearable searchable />
+                <flux:select :disabled="$isView" wire:model.live="category_id" label="Category" placeholder="Choose Category...">
+                @forelse ($categories as $category)
+                    <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
+                @empty
+                    <p>No record found</p>
+                @endforelse
+            </flux:select>
             </div>
+
+            
 
             {{-- Note --}}
             <div class="from-group md:col-span-2">

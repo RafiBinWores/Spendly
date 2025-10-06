@@ -60,9 +60,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transactions/export/pdf', [ReportController::class, 'exportPdf'])
         ->name('transactions.export_pdf');
 
-        Route::get('/download/{path}', DownloadPublicFileController::class)
-    ->where('path', '.*')
-    ->name('files.download');
+    Route::get('/download/{path}', [DownloadPublicFileController::class, 'expenseDownload'])
+        ->where('path', '.*')
+        ->name('files.download');
 });
 
 require __DIR__ . '/auth.php';
