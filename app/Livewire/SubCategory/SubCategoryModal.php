@@ -1,32 +1,32 @@
 <?php
 
-namespace App\Livewire\Category;
+namespace App\Livewire\SubCategory;
 
 use App\Models\Category;
+use App\Models\SubCategory;
 use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Str;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
-class CategoryModal extends Component
+class SubCategoryModal extends Component
 {
-    use WithFileUploads;
     use WithTcToast;
 
-    public $categoryId = null;
+    public $subCategoryId = null;
     public $isView = false;
 
     public string $icon = '';
+    public ?int $category_id = null;
 
     public $name = null, $status = 'active';
 
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:categories,name,' . $this->categoryId,
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255|unique:sub_categories,name,' . $this->subCategoryId,
             'icon'             => 'nullable|string|max:64',
             'status' => 'required|in:active,disable',
         ];
@@ -49,17 +49,18 @@ class CategoryModal extends Component
         // Prepare the payload
         $saveData = [
             'user_id'    => Auth::user()->id,
+            'category_id'    => $this->category_id,
             'name'       => $this->name,
             'icon'       => $this->icon,
             'status'     => $this->status,
         ];
 
-        if ($this->categoryId) {
-            $category = Category::find($this->categoryId);
+        if ($this->subCategoryId) {
+            $subCategory = SubCategory::find($this->subCategoryId);
 
-            if (!$category) {
+            if (!$subCategory) {
                 $this->error(
-                    title: 'Category not found!',
+                    title: 'Sub-Category not found!',
                     position: 'top-right',
                     showProgress: true,
                     showCloseIcon: true,
@@ -68,10 +69,10 @@ class CategoryModal extends Component
             }
 
             // Check for changes WITHOUT persisting
-            $original = $category->getAttributes();
-            $category->fill($saveData);
-            $hasChanges = $category->isDirty();
-            $category->fill($original); // revert to original before actual update
+            $original = $subCategory->getAttributes();
+            $subCategory->fill($saveData);
+            $hasChanges = $subCategory->isDirty();
+            $subCategory->fill($original); // revert to original before actual update
 
             if (!$hasChanges) {
                 $this->warning(
@@ -80,42 +81,42 @@ class CategoryModal extends Component
                     showProgress: true,
                     showCloseIcon: true,
                 );
-                $this->dispatch('categories:refresh');
-                Flux::modal('category-modal')->close();
+                $this->dispatch('subCategories:refresh');
+                Flux::modal('subCategory-modal')->close();
                 return;
             }
 
             // Persist updates
-            $category->update($saveData);
+            $subCategory->update($saveData);
 
             $this->success(
-                title: 'Category updated successfully.',
+                title: 'Sub-Category updated successfully.',
                 position: 'top-right',
                 showProgress: true,
                 showCloseIcon: true,
             );
         } else {
-            Category::create($saveData);
+            SubCategory::create($saveData);
 
             // Reset fields you want cleared for a fresh form (adjust as needed)
             $this->reset();
             $this->status = 'active';
 
             $this->success(
-                title: 'Category created successfully.',
+                title: 'Sub-Category created successfully.',
                 position: 'top-right',
                 showProgress: true,
                 showCloseIcon: true,
             );
         }
 
-        $this->dispatch('categories:refresh');
-        Flux::modal('category-modal')->close();
+        $this->dispatch('subCategories:refresh');
+        Flux::modal('subCategory-modal')->close();
     }
 
 
-    #[On('open-category-modal')]
-    public function categoryDetail($mode, $category = null)
+    #[On('open-subCategory-modal')]
+    public function subCategoryDetail($mode, $subCategory = null)
     {
 
         $this->resetErrorBag();
@@ -129,18 +130,24 @@ class CategoryModal extends Component
             $this->reset();
             $this->status = 'active';
         } else {
-            // dd($category);
-            $this->categoryId = $category['id'];
-
-            $this->name = $category['name'];
-            $this->icon = $category['icon'];
-            $this->status = $category['status'];
+            // dd($subCategory);
+            $this->subCategoryId = $subCategory['id'] ?? null;
+            $this->name = $subCategory['name'] ?? null;
+            $this->icon = $subCategory['icon'] ?? '';
+            $this->category_id   = $subCategory['category_id'] ?? null;
+            $this->status = $subCategory['status'] ?? 'active';
         }
     }
-
+    
     public function render()
     {
-
-        return view('livewire.category.category-modal');
+        $categories = Category::where('user_id', Auth::user()->id)
+            ->where('status', 'active')
+            ->orderBy('name', 'asc')
+            ->get(['id', 'name']);
+            
+        return view('livewire.sub-category.sub-category-modal', [
+            'categories' => $categories,
+        ]);
     }
 }

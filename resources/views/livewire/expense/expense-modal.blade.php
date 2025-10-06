@@ -70,20 +70,6 @@
 
             </div>
 
-            {{-- <flux:select wire:model.live="category_id" placeholder="Choose Category...">
-                @php
-                    $categories = App\Models\Category::where('status', 'active')->orderBy('name', 'ASC')->get();
-                @endphp
-
-                @forelse ($categories as $category)
-                    <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
-                    
-                @empty
-                    <p>No record found</p>
-                @endforelse
-            </flux:select> --}}
-
-
             {{-- Note --}}
             <div class="from-group md:col-span-2">
                 <x-textarea label="Note" rows="3" wire:model.live="note"

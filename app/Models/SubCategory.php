@@ -4,18 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class SubCategory extends Model
 {
     protected $fillable = [
         'user_id',
+        'category_id',
         'name',
         'icon',
         'status',
     ];
 
-    public function subCategories()
+    public function category()
     {
-        return $this->hasMany(SubCategory::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function scopeSearch($query, $value)

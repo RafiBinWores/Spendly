@@ -2,19 +2,19 @@
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
-                src="{{ asset('assets/images/icons/category.png') }}" alt="Category Icon">{{ __('Category') }}
+                src="{{ asset('assets/images/icons/subCategory.png') }}" alt="Sub subCategory Icon">{{ __('Sub Category') }}
         </flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
     {{-- Create modal Button --}}
-    <flux:modal.trigger name="category-modal">
+    <flux:modal.trigger name="subCategory-modal">
         <flux:button class="cursor-pointer" icon="plus-circle" variant="primary"
-            wire:click="$dispatch('open-category-modal', {mode: 'create'})">Add Category</flux:button>
+            wire:click="$dispatch('open-subCategory-modal', {mode: 'create'})">Add Sub Category</flux:button>
     </flux:modal.trigger>
 
-    {{-- Category Modal --}}
-    <livewire:category.category-modal />
+    {{-- subCategory Modal --}}
+    <livewire:sub-category.sub-category-modal />
 
     {{-- Delete Confirmation Modal --}}
     <livewire:common.delete-confirmation />
@@ -70,50 +70,49 @@
 
         <!-- Mobile list (xs only) -->
         <ul class="sm:hidden space-y-3">
-            @forelse ($categories as $cat)
+            @forelse ($subCategories as $subCategory)
                 <li class="rounded-xl border dark:border-neutral-600 p-3 bg-white dark:bg-neutral-700">
                     <div class="flex items-center gap-3">
                         <div class="shrink-0 bg-neutral-800 rounded-lg p-2">
-                            @if ($cat->icon)
-                                <span>{{ $cat->icon }}</span>
+                            @if ($subCategory->icon)
+                                <span>{{ $subCategory->icon }}</span>
                             @endif
                         </div>
 
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="font-medium truncate">{{ $cat->name }}</p>
+                                <p class="font-medium truncate">{{ $subCategory->name }}</p>
                                 <flux:badge variant="solid" size="sm"
-                                    color="{{ $cat->status === 'active' ? 'emerald' : 'red' }}">
-                                    {{ ucfirst($cat->status) }}
+                                    color="{{ $subCategory->status === 'active' ? 'emerald' : 'red' }}">
+                                    {{ ucfirst($subCategory->status) }}
                                 </flux:badge>
                             </div>
 
                             <div class="mt-1 flex flex-wrap items-center gap-2">
 
                                 <span class="text-xs text-neutral-500 dark:text-neutral-300">
-                                    {{ $cat->created_at->format('M d, Y') }}
+                                    {{ $subCategory->created_at->format('M d, Y') }}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-
-                    {{-- SUb category count --}}
+                    {{-- Category --}}
                     <div class="mt-3 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-300">
-                        Sub Category Count: {{ $cat->subCategories->count() }}
+                        Category: {{ $subCategory->category->name }}
                     </div>
 
                     <!-- Actions -->
                     <div class="mt-3 flex items-center gap-2">
-                        <flux:modal.trigger name="category-modal">
+                        <flux:modal.trigger name="subCategory-modal">
                             <flux:button
-                                wire:click="$dispatch('open-category-modal', {mode: 'view', category: {{ $cat }}})"
+                                wire:click="$dispatch('open-subCategory-modal', {mode: 'view', subCategory: {{ $subCategory }}})"
                                 class="cursor-pointer h-[30px]" variant="primary" color="yellow">
                                 view
                             </flux:button>
 
                             <flux:button
-                                wire:click="$dispatch('open-category-modal', {mode: 'edit', category: {{ $cat }}})"
+                                wire:click="$dispatch('open-subCategory-modal', {mode: 'edit', subCategory: {{ $subCategory }}})"
                                 class="cursor-pointer  h-[30px]" variant="primary" color="blue">
                                 Edit
                             </flux:button>
@@ -122,11 +121,11 @@
                         <flux:modal.trigger name="delete-confirmation-modal">
                             <flux:button
                                 wire:click="$dispatch('confirm-delete', {
-                                    id: {{ $cat->id }},
-                                    dispatchAction: 'delete-category',
+                                    id: {{ $subCategory->id }},
+                                    dispatchAction: 'delete-subCategory',
                                     modalName: 'delete-confirmation-modal',
-                                    heading: 'Delete category?',
-                                    message: 'You are about to delete this category. This action cannot be reversed.',
+                                    heading: 'Delete subCategory?',
+                                    message: 'You are about to delete this subCategory. This action cannot be reversed.',
                                 })"
                                 class="cursor-pointer h-[30px]" variant="primary" color="red">
                                 Delete
@@ -135,7 +134,7 @@
                     </div>
                 </li>
             @empty
-                <li class="text-center py-4">No categories found.</li>
+                <li class="text-center py-4">No subCategories found.</li>
             @endforelse
         </ul>
 
@@ -150,7 +149,7 @@
                             'name' => 'name',
                             'displayName' => 'Name',
                         ])
-                        <th scope="col" class="px-4 lg:px-6 py-3">Sub Category Count</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">Category</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'status',
                             'displayName' => 'Status',
@@ -163,39 +162,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($categories as $cat)
-                        <tr wire:key="{{ $cat->id }}" class="border-b dark:border-neutral-600">
+                    @forelse ($subCategories as $subCategory)
+                        <tr wire:key="{{ $subCategory->id }}" class="border-b dark:border-neutral-600">
                             <th scope="row" class="px-4 lg:px-6 py-3">
-                                {{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}
+                                {{ ($subCategories->currentPage() - 1) * $subCategories->perPage() + $loop->iteration }}
                             </th>
-                            <td class="px-4 lg:px-6 py-3">{{-- Example: show category icon + name --}}
+                            <td class="px-4 lg:px-6 py-3">{{-- Example: show subCategory icon + name --}}
                                 <div class="flex items-center gap-2">
                                     <div class="bg-neutral-800 p-2 rounded-lg shrink-0">
-                                        @if ($cat->icon)
-                                            <span>{{ $cat->icon }}</span>
+                                        @if ($subCategory->icon)
+                                            <span>{{ $subCategory->icon }}</span>
                                         @endif
                                     </div>
-                                    <span>{{ $cat->name }}</span>
+                                    <span>{{ $subCategory->name }}</span>
                                 </div>
                             <td class="px-4 lg:px-6 py-3 capitalize">
-                                <x-badge label="{{ $cat->subCategories->count() }}" white />
+                                <div class="flex items-center gap-2">
+                                    <div class="bg-neutral-800 p-2 rounded-lg shrink-0">
+                                        @if ($subCategory->category->icon)
+                                            <span>{{ $subCategory->category->icon }}</span>
+                                        @endif
+                                    </div>
+                                    <span>{{ $subCategory->category->name }}</span>
+                                </div>
                             </td>
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 <flux:badge variant="solid" size="sm"
-                                    color="{{ $cat->status === 'active' ? 'green' : 'red' }}">{{ $cat->status }}
+                                    color="{{ $subCategory->status === 'active' ? 'green' : 'red' }}">{{ $subCategory->status }}
                                 </flux:badge>
                             </td>
-                            <td class="px-4 lg:px-6 py-3">{{ $cat->created_at->format('M d, Y') }}</td>
+                            <td class="px-4 lg:px-6 py-3">{{ $subCategory->created_at->format('M d, Y') }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
-                                    <flux:modal.trigger name="category-modal">
+                                    <flux:modal.trigger name="subCategory-modal">
                                         <flux:button
-                                            wire:click="$dispatch('open-category-modal', {mode: 'view', category: {{ $cat }}})"
+                                            wire:click="$dispatch('open-subCategory-modal', {mode: 'view', subCategory: {{ $subCategory }}})"
                                             class="cursor-pointer min-h-[40px]" icon="eye" variant="primary"
                                             color="yellow">
                                         </flux:button>
                                         <flux:button
-                                            wire:click="$dispatch('open-category-modal', {mode: 'edit', category: {{ $cat }}})"
+                                            wire:click="$dispatch('open-subCategory-modal', {mode: 'edit', subCategory: {{ $subCategory }}})"
                                             class="cursor-pointer min-h-[40px]" icon="pencil" variant="primary"
                                             color="blue">
                                         </flux:button>
@@ -204,11 +210,11 @@
                                     <flux:modal.trigger name="delete-confirmation-modal">
                                         <flux:button
                                             wire:click="$dispatch('confirm-delete', {
-                                                id: {{ $cat->id }},
-                                                dispatchAction: 'delete-category',
+                                                id: {{ $subCategory->id }},
+                                                dispatchAction: 'delete-subCategory',
                                                 modalName: 'delete-confirmation-modal',
-                                                heading: 'Delete category?',
-                                                message: 'You are about to delete this category. This action cannot be undone.',
+                                                heading: 'Delete sub-category?',
+                                                message: 'You are about to delete this subCategory. This action cannot be undone.',
                                                 })"
                                             class="cursor-pointer min-h-[40px]" icon="trash" variant="primary"
                                             color="red">
@@ -219,7 +225,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No categories found.</td>
+                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No subCategories found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -229,10 +235,10 @@
         <!-- Pagination -->
         <nav class="mt-4">
             <div class="sm:hidden text-center">
-                {{ $categories->onEachSide(0)->links() }}
+                {{ $subCategories->onEachSide(0)->links() }}
             </div>
             <div class="hidden sm:block">
-                {{ $categories->links() }}
+                {{ $subCategories->links() }}
             </div>
         </nav>
     </div>

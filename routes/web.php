@@ -10,6 +10,7 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
+use App\Livewire\SubCategory\SubCategoryIndex;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -40,6 +41,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Categories
     Route::get('categories', CategoryIndex::class)->name('categories.index');
+
+    // Sub Categories
+    Route::get('sub-categories', SubCategoryIndex::class)->name('subCategories.index');
 
     // Income routes
     Route::get('incomes', IncomeIndex::class)->name('incomes.index');
