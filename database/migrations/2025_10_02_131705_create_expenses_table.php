@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('expense_date');
             $table->text('note')->nullable();
             $table->string('icon');
+            $table->json('files')->nullable();
             $table->timestamps();
         });
     }

@@ -14,6 +14,11 @@ class Expense extends Model
         'expense_date',
         'note',
         'icon',
+        'files',
+    ];
+
+    protected $casts = [
+        'files' => 'array',
     ];
 
     public function user()

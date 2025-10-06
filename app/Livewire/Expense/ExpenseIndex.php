@@ -6,6 +6,7 @@ use App\Models\Expense;
 use Carbon\Carbon;
 use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -102,6 +103,16 @@ class ExpenseIndex extends Component
         $expense = Expense::find($id);
 
         if ($expense) {
+
+            // Delete all associated files from disk
+            $files = $expense->files ?? [];
+            if (!empty($files) && is_array($files)) {
+                foreach ($files as $path) {
+                    if (Storage::disk('public')->exists($path)) {
+                        Storage::disk('public')->delete($path);
+                    }
+                }
+            }
 
             $expense->delete();
             $this->dispatch('expenses:deleted');

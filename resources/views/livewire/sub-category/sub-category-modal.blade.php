@@ -49,7 +49,6 @@
                 @endforelse
             </flux:select>
 
-
             {{-- Status select --}}
             <div class="form-group">
                 <flux:select :disabled="$isView" wire:model="status" label="Status" placeholder="Choose status...">
@@ -57,7 +56,6 @@
                     <flux:select.option value="disable">Disable</flux:select.option>
                 </flux:select>
             </div>
-
 
             {{-- Submit & Cancel button --}}
             <div class="flex">
