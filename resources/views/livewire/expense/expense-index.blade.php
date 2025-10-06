@@ -152,6 +152,9 @@
                         <th scope="col" class="px-4 lg:px-6 py-3">
                             Category
                         </th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">
+                            Sub Category
+                        </th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'expense_date',
                             'displayName' => 'Date',
@@ -183,6 +186,9 @@
                             </td>
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 {{ $expense->category->name ?? 'Uncategorized' }}
+                            </td>
+                            <td class="px-4 lg:px-6 py-3 capitalize">
+                                {{ $expense->subCategories->name ?? 'Uncategorized' }}
                             </td>
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 {{ date('M d, Y', strtotime($expense->expense_date)) }}

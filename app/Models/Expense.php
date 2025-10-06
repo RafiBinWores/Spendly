@@ -9,6 +9,7 @@ class Expense extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'subcategory_id',
         'source',
         'amount',
         'expense_date',
@@ -29,6 +30,10 @@ class Expense extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function subCategories()
+    {
+        return $this->belongsTo(SubCategory::class, 'subcategory_id');
     }
 
     public function scopeSearch($query, $value)

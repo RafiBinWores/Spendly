@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 
 class Transactions extends Component
 {
-        use WithPagination;
+    use WithPagination;
 
     // Filters
     #[Url(except: 'all')] public string $type = 'all';  // all|income|expense
@@ -29,7 +29,7 @@ class Transactions extends Component
 
     public function updated($prop): void
     {
-        if (in_array($prop, ['type','from','to','perPage'], true)) {
+        if (in_array($prop, ['type', 'from', 'to', 'perPage'], true)) {
             $this->resetPage();
         }
     }
@@ -40,7 +40,7 @@ class Transactions extends Component
 
         // Income side (no category)
         $incomes = DB::table('incomes as i')
-            ->when($this->from && $this->to, fn($q) => $q->whereBetween('i.income_date', [$this->from.' 00:00:00', $this->to.' 23:59:59']))
+            ->when($this->from && $this->to, fn($q) => $q->whereBetween('i.income_date', [$this->from . ' 00:00:00', $this->to . ' 23:59:59']))
             ->where('i.user_id', $uid)
             ->select([
                 'i.id',
@@ -55,7 +55,7 @@ class Transactions extends Component
         // Expense side (has category)
         $expenses = DB::table('expenses as e')
             ->leftJoin('categories as c', 'c.id', '=', 'e.category_id')
-            ->when($this->from && $this->to, fn($q) => $q->whereBetween('e.expense_date', [$this->from.' 00:00:00', $this->to.' 23:59:59']))
+            ->when($this->from && $this->to, fn($q) => $q->whereBetween('e.expense_date', [$this->from . ' 00:00:00', $this->to . ' 23:59:59']))
             ->where('e.user_id', $uid)
             ->select([
                 'e.id',
@@ -95,8 +95,8 @@ class Transactions extends Component
         $expenseQ = DB::table('expenses')->where('user_id', $uid);
 
         if ($this->from && $this->to) {
-            $incomeQ->whereBetween('income_date', [$this->from.' 00:00:00', $this->to.' 23:59:59']);
-            $expenseQ->whereBetween('expense_date', [$this->from.' 00:00:00', $this->to.' 23:59:59']);
+            $incomeQ->whereBetween('income_date', [$this->from . ' 00:00:00', $this->to . ' 23:59:59']);
+            $expenseQ->whereBetween('expense_date', [$this->from . ' 00:00:00', $this->to . ' 23:59:59']);
         }
 
         if ($this->type === 'income') {
@@ -127,15 +127,15 @@ class Transactions extends Component
         ]);
 
         return [
-            'excel' => route('transactions.export_excel').'?'.$params,
-            'pdf'   => route('transactions.export_pdf').'?'.$params,
+            'excel' => route('transactions.export_excel') . '?' . $params,
+            'pdf'   => route('transactions.export_pdf') . '?' . $params,
         ];
     }
 
-    
+
     public function render()
     {
-                $rows   = $this->rows();
+        $rows   = $this->rows();
         $totals = $this->totals();
 
         return view('livewire.reports.transactions', compact('rows', 'totals'));

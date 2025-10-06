@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Expense;
 
+use App\Models\Category;
 use App\Models\Expense;
+use App\Models\SubCategory;
 use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -24,12 +27,22 @@ class ExpenseModal extends Component
 
     public string $icon = '';
 
-    public $source = null, $amount = null, $expense_date = null, $note = null, $category_id = null;
+    public $source = null, $amount = null, $expense_date = null, $note = null, $category_id = null, $subcategory_id = null;
+
+    public array $subcategories = [];
 
     public function rules(): array
     {
         return [
             'category_id'   => 'nullable|exists:categories,id',
+            'subcategory_id' => [
+                'nullable',
+                Rule::exists('sub_categories', 'id')->where(function ($q) {
+                    if ($this->category_id) {
+                        $q->where('category_id', $this->category_id);
+                    }
+                }),
+            ],
             'source'        => 'required|string|max:255',
             'amount'        => 'required|numeric|min:0',
             'expense_date'  => 'required|date',
@@ -55,6 +68,38 @@ class ExpenseModal extends Component
         $this->resetValidation();
         $this->validateOnly($propertyName);
     }
+
+
+    public function mount()
+    {
+        $this->loadSubcategories();
+    }
+
+    public function updatedCategoryId()
+    {
+        $this->subcategory_id = '';
+        $this->loadSubcategories();
+        $this->resetValidation(['subcategory_id']);
+    }
+
+    protected function loadSubcategories(): void
+    {
+        if (!$this->category_id) {
+            $this->subcategories = [];
+            return;
+        }
+
+        $this->subcategories = SubCategory::query()
+            ->where('status', 'active')
+            ->where('category_id', $this->category_id)
+            ->where(function ($q) {
+                $q->whereNull('user_id')->orWhere('user_id', Auth::id());
+            })
+            ->orderBy('name', 'asc')
+            ->get(['id', 'name'])
+            ->toArray();
+    }
+
 
     /**
      * IMPORTANT: When user picks more files, append them (don’t replace).
@@ -121,6 +166,7 @@ class ExpenseModal extends Component
         $saveData = [
             'user_id'      => Auth::id(),
             'category_id'  => $this->category_id,
+            'subcategory_id' => $this->subcategory_id,
             'source'       => $this->source,
             'amount'       => $this->amount,
             'expense_date' => $this->expense_date,
@@ -143,7 +189,7 @@ class ExpenseModal extends Component
         }
 
         // reset staged uploads; keep the DB-saved list in UI if reopening
-        $this->reset(['files','newFiles','existingFiles','source','amount','expense_date','note','icon','category_id']);
+        $this->reset(['files', 'newFiles', 'existingFiles', 'source', 'amount', 'expense_date', 'note', 'icon', 'category_id']);
         $this->dispatch('expenses:refresh');
         Flux::modal('expense-modal')->close();
     }
@@ -156,10 +202,14 @@ class ExpenseModal extends Component
         $this->isView = $mode === 'view';
 
         if ($mode === 'create') {
-            $this->reset();
+            $this->resetExcept(['isView']);
             $this->files = [];
             $this->newFiles = [];
             $this->existingFiles = [];
+            $this->category_id = '';
+            $this->subcategory_id = '';
+            $this->subcategories = [];
+
             return;
         }
 
@@ -168,6 +218,7 @@ class ExpenseModal extends Component
         $this->amount        = $expense['amount'] ?? null;
         $this->expense_date  = $expense['expense_date'] ?? null;
         $this->category_id   = $expense['category_id'] ?? null;
+        $this->subcategory_id = $expense['subcategory_id'] ?? null;
         $this->note          = $expense['note'] ?? null;
         $this->icon          = $expense['icon'] ?? '';
 
@@ -178,6 +229,12 @@ class ExpenseModal extends Component
 
     public function render()
     {
-        return view('livewire.expense.expense-modal');
+        $categories = Category::where('status', 'active')
+            ->orderBy('name', 'asc')->get(['id', 'name']);
+
+
+        return view('livewire.expense.expense-modal', [
+            'categoryOptions' => $categories,
+        ]);
     }
 }

@@ -167,44 +167,62 @@
 
                 {{-- Source --}}
                 <div class="form-group col-span-4">
-                    <x-input label="Expense Source *" wire:model.live="source"
-                        class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('source') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
-                        placeholder="eg. Chicken Fry" />
+                    <flux:input :disabled="$isView" wire:model="source" label="Expense Source *"
+                        placeholder="e.g. Shopping" />
                 </div>
             </div>
-
-
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{-- amount --}}
                 <div class="form-group">
-                    <x-input label="Expense Amount *" wire:model.live="amount" type="number" step="1"
-                        class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('amount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
-                        placeholder="eg. 50000" />
+                    <flux:input type="number" min="0" :disabled="$isView" wire:model="amount" label="Amount *"
+                        placeholder="e.g. 20,000" />
                 </div>
+
                 {{-- date --}}
                 <div class="form-group">
-                    <x-input label="Expense date *" wire:model.live="expense_date" type="date"
-                        class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('expense_date') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}" />
+                      <flux:input type="date" :disabled="$isView" wire:model="expense_date" label="Date" />
                 </div>
             </div>
 
 
-            <div class="form-group">
-                @php
-                    $categories = App\Models\Category::where('status', 'active')->get();
-                @endphp
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {{-- Category --}}
+                <div class="form-group">
+                    <flux:select :disabled="$isView" wire:model.live="category_id" label="Category"
+                        placeholder="Choose Category...">
+                        @forelse ($categoryOptions as $category)
+                            <flux:select.option value="{{ $category->id }}">{{ $category->name }}
+                            </flux:select.option>
+                        @empty
+                            <flux:select.option disabled>No record found</flux:select.option>
+                        @endforelse
+                    </flux:select>
+                    @error('category_id')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                <flux:select :disabled="$isView" wire:model.live="category_id" label="Category" placeholder="Choose Category...">
-                @forelse ($categories as $category)
-                    <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
-                @empty
-                    <p>No record found</p>
-                @endforelse
-            </flux:select>
+                {{-- Sub-category (depends on Category) --}}
+                <div class="form-group">
+                    <flux:select :disabled="$isView || empty($subcategories)" wire:model.live="subcategory_id"
+                        label="Sub-category"
+                        placeholder="{{ empty($subcategories) ? 'Select Category first' : 'Choose Sub-category...' }}">
+                        @foreach ($subcategories as $sc)
+                            <flux:select.option value="{{ $sc['id'] }}">{{ $sc['name'] }}</flux:select.option>
+                        @endforeach
+                    </flux:select>
+                    @error('subcategory_id')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                    @if (empty($subcategories) && $category_id)
+                        <p class="text-xs text-slate-500 mt-1">No sub-categories found for this category.</p>
+                    @endif
+                </div>
             </div>
 
-            
+
+
 
             {{-- Note --}}
             <div class="from-group md:col-span-2">
