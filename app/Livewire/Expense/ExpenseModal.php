@@ -35,14 +35,7 @@ class ExpenseModal extends Component
     {
         return [
             'category_id'   => 'nullable|exists:categories,id',
-            'subcategory_id' => [
-                'nullable',
-                Rule::exists('sub_categories', 'id')->where(function ($q) {
-                    if ($this->category_id) {
-                        $q->where('category_id', $this->category_id);
-                    }
-                }),
-            ],
+            'subcategory_id' => 'nullable|exists:sub_categories,id,category_id,' . ($this->category_id ?? 'NULL'),
             'source'        => 'required|string|max:255',
             'amount'        => 'required|numeric|min:0',
             'expense_date'  => 'required|date',
@@ -159,18 +152,28 @@ class ExpenseModal extends Component
         // validate everything, including last temp picks if any
         $this->validate();
 
+        // Normalize IDs
+        $catId = ($this->category_id === '' || $this->category_id === null) ? null : (int) $this->category_id;
+        $subId = ($this->subcategory_id === '' || $this->subcategory_id === null) ? null : (int) $this->subcategory_id;
+
+        // If no category, force subcategory null (avoid orphan)
+        if ($catId === null) {
+            $subId = null;
+        }
+
+
         // store new ones (from the accumulated $files)
         $newPaths = $this->storeUploadedFiles();
         $allPaths = array_merge($this->existingFiles, $newPaths);
 
         $saveData = [
             'user_id'      => Auth::id(),
-            'category_id'  => $this->category_id,
-            'subcategory_id' => $this->subcategory_id,
+            'category_id'  => $catId,
+            'subcategory_id' => $subId,
             'source'       => $this->source,
             'amount'       => $this->amount,
             'expense_date' => $this->expense_date,
-            'files'        => $allPaths,   // JSON array in DB
+            'files'        => $allPaths,
             'note'         => $this->note,
             'icon'         => $this->icon,
         ];

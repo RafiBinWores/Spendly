@@ -19,36 +19,70 @@
     </div>
 
     {{-- Filters --}}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div>
-            <label class="text-sm text-neutral-500">Type</label>
-            <select wire:model.live="type"
-                    class="w-full border rounded-lg ps-3 pe-10 py-2 dark:bg-neutral-900 dark:border-neutral-700">
-                <option value="all">All</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-            </select>
-        </div>
-        <div>
-            <label class="text-sm text-neutral-500">From</label>
-            <input type="date" wire:model.live="from"
-                   class="w-full border rounded-lg px-3 py-2 dark:bg-neutral-900 dark:border-neutral-700">
-        </div>
-        <div>
-            <label class="text-sm text-neutral-500">To</label>
-            <input type="date" wire:model.live="to"
-                   class="w-full border rounded-lg px-3 py-2 dark:bg-neutral-900 dark:border-neutral-700">
-        </div>
-        <div>
-            <label class="text-sm text-neutral-500">Show</label>
-            <select wire:model.live="perPage"
-                    class="w-full border rounded-lg ps-3 pe-10 py-2 dark:bg-neutral-900 dark:border-neutral-700">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-            </select>
-        </div>
+    {{-- Filters --}}
+<div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+    <div>
+        <label class="text-sm text-neutral-500">Type</label>
+        <select wire:model.live="type"
+                class="w-full border rounded-lg ps-3 pe-10 py-2 dark:bg-neutral-900 dark:border-neutral-700">
+            <option value="all">All</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
     </div>
+
+    <div>
+        <label class="text-sm text-neutral-500">From</label>
+        <input type="date" wire:model.live="from"
+               class="w-full border rounded-lg px-3 py-2 dark:bg-neutral-900 dark:border-neutral-700">
+    </div>
+
+    <div>
+        <label class="text-sm text-neutral-500">To</label>
+        <input type="date" wire:model.live="to"
+               class="w-full border rounded-lg px-3 py-2 dark:bg-neutral-900 dark:border-neutral-700">
+    </div>
+
+    {{-- NEW: Category filter --}}
+    <div>
+        <label class="text-sm text-neutral-500">Category</label>
+        <select wire:model.live="categoryId"
+                class="w-full border rounded-lg ps-3 pe-10 py-2 dark:bg-neutral-900 dark:border-neutral-700"
+                wire:key="report-cat-select">
+            <option value="">All Categories</option>
+            @foreach ($categoryOptions as $cat)
+                <option value="{{ $cat['id'] }}">{{ $cat['name'] }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- NEW: Sub-category filter (depends on Category) --}}
+    <div>
+        <label class="text-sm text-neutral-500">Sub-category</label>
+        <select wire:model.live="subcategoryId"
+                class="w-full border rounded-lg ps-3 pe-10 py-2 dark:bg-neutral-900 dark:border-neutral-700"
+                {{ empty($subcategories) ? 'disabled' : '' }}
+                wire:key="report-subcat-select-{{ $categoryId }}">
+            <option value="">
+                {{ empty($subcategories) ? 'Select Category first' : 'All Sub-categories' }}
+            </option>
+            @foreach ($subcategories as $sc)
+                <option value="{{ $sc['id'] }}">{{ $sc['name'] }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <div>
+        <label class="text-sm text-neutral-500">Show</label>
+        <select wire:model.live="perPage"
+                class="w-full border rounded-lg ps-3 pe-10 py-2 dark:bg-neutral-900 dark:border-neutral-700">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+</div>
+
 
     {{-- Totals --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -81,6 +115,7 @@
                         <th class="py-2">Date</th>
                         <th class="py-2">Type</th>
                         <th class="py-2">Category</th>
+                        <th class="py-2">Sub-category</th>
                         <th class="py-2">Note</th>
                         <th class="py-2 text-right">Amount</th>
                     </tr>
@@ -97,6 +132,7 @@
                                 @endif
                             </td>
                             <td class="py-2">{{ $r->category_name ?? '—' }}</td>
+                            <td class="py-2">{{ $r->subcategory_name ?? '—' }}</td>
                             <td class="py-2 truncate max-w-[16rem]" title="{{ $r->note }}">{{ $r->note }}</td>
                             <td class="py-2 text-right font-medium">
                                 @if ($r->type === 'income')
